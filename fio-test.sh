@@ -75,6 +75,7 @@
 
         function fio_nossd_test(){
             echo "start $type test"
+            
             #顺序读 顺序写 顺序读写 默认配置
             if [ "$type" == "write" ]  || [ "$type" == "read" ];then
                 size='100G'
@@ -85,7 +86,7 @@
                 norandommap=''
                 randrepeat=''
                 rwmixread=''
-
+    
             elif [ "$type" == "rw" ];then
                 size='50G'
                 block_size="128k"
@@ -105,6 +106,7 @@
                 norandommap="--norandommap"
                 randrepeat="--randrepeat=0"
                 rwmixread=''
+                runtime='--runtime=5400'
 
             elif [ "$type" == "randrw" ];then
                 size='5G'
@@ -115,6 +117,7 @@
                 norandommap="--norandommap"
                 randrepeat="--randrepeat=0"
                 rwmixread="--rwmixread=70"
+                runtime='--runtime=5400'
 
             elif [ "$type" == "kafka" ];then
 
@@ -142,7 +145,7 @@
                 # path=$(lsblk  | grep $disk | awk {'print $7'})
                 path="/data/$i"
                 mkdir -p $path/test
-                ${FIO_CMD} --directory=$path/test ${direct}  --rw=${type} --refill_buffers ${norandommap} ${randrepeat} --ioengine=libaio --bs=${block_size} ${rwmixread}  --ramp_time=60 --iodepth=${iodepth} --numjobs=${numjobs}  --group_reporting --name=4ktestwrite$i --size=${size} --output-format=json -output=$output_filename &
+                ${FIO_CMD} --directory=$path/test ${direct}  ${runtime} --rw=${type} --refill_buffers ${norandommap} ${randrepeat} --ioengine=libaio --bs=${block_size} ${rwmixread}  --ramp_time=60 --iodepth=${iodepth} --numjobs=${numjobs}  --group_reporting --name=4ktestwrite$i --size=${size} --output-format=json -output=$output_filename &
                 let i=i+1
 
                 # if [ ${check_read} == 1 ];then
@@ -344,6 +347,10 @@
         function test_start(){
 
             if [ "${mode}" == 'all' ];then
+
+                type='kafka'
+                fio_nossd_test
+                wait_finish
 
                 type='write'
                 fio_nossd_test
