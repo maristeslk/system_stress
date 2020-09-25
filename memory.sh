@@ -1,5 +1,6 @@
 #!/bin/bash
-
+wget https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/stream -O /usr/bin/stream
+wget https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/stream_omp -O /usr/bin/stream_omp
 rm -f mem_test.log 2>/dev/null
 rm -f mem.csv 2>/dev/null
 rm -f temp 2>/dev/null
@@ -44,27 +45,27 @@ stream()
 	echo `date`
 }
 
-CMD="../bin/stream"
+CMD="/usr/bin/stream"
 echo "Single thread" |tee -a mem.csv
 echo "Function,Rate (MB/s),Avg time,Min time,Max time" >>mem.csv
 stream
-CMD="../bin/stream_omp"
+CMD="/usr/bin/stream_omp"
 echo "" >>mem.csv
 echo "Multi threads" |tee -a mem.csv
 echo "Function,Rate (MB/s),Avg time,Min time,Max time" >>mem.csv
 stream
 echo "" >>mem.csv
 
-CMD="numactl --cpunodebind=0 --membind=0 ../bin/stream"
-echo "Single thread within the NUMA node" |tee -a mem.csv
-echo "Function,Rate (MB/s),Avg time,Min time,Max time" >>mem.csv
-stream
-echo "" >>mem.csv
-CMD="numactl --cpunodebind=0 --membind=1 ../bin/stream"
-echo "Single thread cross the NUMA node" |tee -a mem.csv
-echo "Function,Rate (MB/s),Avg time,Min time,Max time" >>mem.csv
-stream
-echo "" >>mem.csv
+# CMD="numactl --cpunodebind=0 --membind=0 /usr/bin/stream"
+# echo "Single thread within the NUMA node" |tee -a mem.csv
+# echo "Function,Rate (MB/s),Avg time,Min time,Max time" >>mem.csv
+# stream
+# echo "" >>mem.csv
+# CMD="numactl --cpunodebind=0 --membind=1 /usr/bin/stream"
+# echo "Single thread cross the NUMA node" |tee -a mem.csv
+# echo "Function,Rate (MB/s),Avg time,Min time,Max time" >>mem.csv
+# stream
+# echo "" >>mem.csv
 
 echo "Latency test,ns" |tee -a mem.csv
 ../bin/lat_mem_rd -N 1 -P 1 $mem 1024 2>&1 |grep -v stride|tee -a temp
