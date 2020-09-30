@@ -1,6 +1,4 @@
-
 #!/bin/bash
-
 HOSTNAME=$(hostname)
 vendor=`dmidecode -s system-manufacturer | tail -n 1`
 system_version=$(cat /etc/lsb-release  | grep DISTRIB_RELEASE | cut -d '=' -f 2)
