@@ -1,5 +1,5 @@
 #/bin/bash
-apt-get install lsscsi
+apt-get install lsscsi sysstat
 result_dir=/root/sysinfo_result
 mkdir -p $result_dir
 CPUMODEL=`grep "model name" /proc/cpuinfo | sort -u | tr -s ' ' | awk 'BEGIN{FS=": "} {print $2}'|cut -d " " -f 4`

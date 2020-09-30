@@ -272,7 +272,11 @@
             check_list='write_128k_32-write_clat'
             limit='100'
             check_result
-            
+
+            check_list='write_4k_32-write_clat'
+            limit='100'
+            check_result            
+
             check_list='randwrite_4k_32-write_clat'
             limit='10000'
             check_result

@@ -42,7 +42,7 @@ TYPE="direct"
 echo $HOSTNAME 
 
 
-function smartd_install(){
+function install(){
     if  [ $system_version == '18.04' ];then
         apt-get -y install smartmontools  lsscsi
         #更新drivedb.h
