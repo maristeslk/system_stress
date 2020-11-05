@@ -60,6 +60,7 @@ smartd_create() {
           fi          
           tmpinfo="$DISK_TYPE;$SLOT_NUM;$SN"
           SMART_INFO+=" ${tmpinfo}"
+
           if [ "$DISK_TYPE" == "sata" ];then
   #CHART type.id         name    title                                    units [family [context [charttype [priority [update_every [options [plugin [module]]]]]]]]
             cat  << EOF
@@ -79,23 +80,6 @@ EOF
           fi
         done
 
-    #判断是否有nvme盘
-    if [ "$IFNVME" == "1" ];then
-      for DISK_DRIVE in $( ls /dev/nvme* | grep -E "/dev/nvme[0-9]$")
-        do
-                SN=$(smartctl  -a $DISK_DRIVE | grep  -E "[S|s]erial [N|n]umber:"  | awk '{print $3}')
-                SLOT_NUM=$( lspci |  grep -i 'nvme' | awk '{print $1}')
-                DISK_TYPE='nvme'
-                DISK=$(echo ${DISK_DRIVE}| cut -d '/' -f 3)
-
-                tmpinfo="$DISK_TYPE;$SLOT_NUM;$DISK_DRIVE;$SN"
-                SMART_INFO+=" ${tmpinfo}"
-        cat  << EOF
-CHART  smartd_${SLOT}.status '' "smart_info on ${SLOT}" "smart" "${SLOT}" "disk" smart_value smart_info_${SLOT} line $((smartd_priority + 1)) $smartd_update_every
-DIMENSION media_and_data_integrity_errors 'media_and_data_integrity_errors' absolute 1 1
-DIMENSION error_information_log_entries 'error_information_log_entries' absolute 1 1
-EOF
-        done 
     fi
 
 
@@ -137,8 +121,11 @@ EOF
           fi
     done
 
+
+  fi
+
     #判断是否有nvme盘
-    if [ "$IFNVME" == "1" ];then
+  if [ "$IFNVME" == "1" ];then
       for DISK_DRIVE in $( ls /dev/nvme* | grep -E "/dev/nvme[0-9]$")
         do
                 SN=$(smartctl  -a $DISK_DRIVE | grep  -E "[S|s]erial [N|n]umber:"  | awk '{print $3}')
@@ -153,11 +140,8 @@ CHART  smartd_${DISK}.status '' "smart_info on ${DISK}" "smart" "${DISK}" "disk"
 DIMENSION media_and_data_integrity_errors 'media_and_data_integrity_errors' absolute 1 1
 DIMENSION error_information_log_entries 'error_information_log_entries' absolute 1 1
 EOF
-        done 
+        done
     fi
-
-  fi
-
   return 0
 }
 smartd_get() {
@@ -289,7 +273,7 @@ smartd_check() {
   #  - 1 to disable the chart
 
   # require_cmd smartctl && [ ! -d "$DISKSN_PATH" ] && return 0
-  # require_cmd smartctl && require_cmd lsscsi  && return 0
+  require_cmd smartctl && require_cmd lsscsi  && return 0
   #   # check that we can collect data
   #   smartd_get || return 1
     return 0
