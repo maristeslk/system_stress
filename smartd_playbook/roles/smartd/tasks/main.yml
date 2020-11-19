@@ -51,26 +51,18 @@
     group: netdata
   become: yes
 
-
 - name: copy smartmontool config
   copy:
     src:  smartmontools
     dest: /etc/default/smartmontools
     mode: 0664
-    owner: netdata
-    group: netdata
+    owner: root
+    group: root
   become: yes
 
-- name:  smartd enable
+- name:  restart smartd
   service:
-    name: systemd-timesyncd
-    state: restart
-    enabled: yes
-  become: yes
-
-- name:  smartd enable
-  service:
-    name: systemd-timesyncd
+    name: smartd
     state: restart
     enabled: yes
   become: yes
