@@ -62,7 +62,7 @@
 
 - name:  restart smartded
   service:
-    name: smartd
+    name: smartmontools
     state: restarted
     enabled: yes
   become: yes
