@@ -18,23 +18,27 @@
   get_url:
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/perccli64
     dest: /usr/sbin/perccli64
-    mode: 4755
   when: manufacturer.stdout == 'Dell Inc.'
 
 - name: get mega raid tools
   get_url:
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/storcli64
     dest: /usr/sbin/storcli64
-    mode: 4755
+
 
 - name: get megaclisas
   get_url:
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/megaclisas-status.py
     dest: /usr/sbin/megaclisas-status
-    mode: 4755
+
 
 - name: change smartctl sid
-  shell: chmod 4755 /usr/sbin/smartctl
+  shell: chmod 4755 {{ item }}
+  with_items:
+    - /usr/sbin/smartctl
+    - /usr/sbin/storcli64
+    - /usr/sbin/megaclisas-status
+    - /usr/sbin/perccli64
   become: yes
 
 - name: copy smartd script
@@ -77,3 +81,12 @@
     state: restarted
     enabled: true
   become: true
+
+- name: copy netdata sudo file
+  copy:
+    src: templates/netdata
+    dest: /etc/sudoers.d/
+    mode: 0440 
+    owner: root
+    group: root
+  become: yes

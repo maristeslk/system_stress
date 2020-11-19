@@ -1,0 +1,1 @@
+netdata ALL=(ALL) NOPASSWD: /bin/cat, /usr/sbin/perccli64, /usr/sbin/storcli64, /usr/sbin/megaclisas-status
