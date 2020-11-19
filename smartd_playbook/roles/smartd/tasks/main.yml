@@ -18,20 +18,24 @@
   get_url:
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/perccli64
     dest: /usr/sbin/perccli64
-    mode: 4744
+    mode: 4755
   when: manufacturer.stdout == 'Dell Inc.'
 
 - name: get mega raid tools
   get_url:
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/storcli64
     dest: /usr/sbin/storcli64
-    mode: 4744
+    mode: 4755
 
 - name: get megaclisas
   get_url:
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/megaclisas-status.py
     dest: /usr/sbin/megaclisas-status
-    mode: 4744
+    mode: 4755
+
+- name: change smartctl sid
+  shell: chmod 4755 /usr/sbin/smartctl
+  become: yes
 
 - name: copy smartd script
   copy:
@@ -55,7 +59,7 @@
   copy:
     src:  smartmontools
     dest: /etc/default/smartmontools
-    mode: 0664
+    mode: 0755
     owner: root
     group: root
   become: yes

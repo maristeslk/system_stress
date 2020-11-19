@@ -45,7 +45,7 @@ case $vendor in
         ;;
  *Dell*)
         vendor="dell"
-        raid_tool='perrccli64'
+        raid_tool='perccli64'
         ;;
  *HP*)
         vendor="hp"
