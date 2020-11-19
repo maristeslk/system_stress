@@ -1,0 +1,83 @@
+- name: checking system manufacturer
+  shell: "dmidecode -s system-manufacturer"
+  register: manufacturer
+  become: true
+
+- name: install smartools
+  apt:
+    state: present
+    force: yes
+    update_cache: yes
+    install_recommends: no
+    pkg:
+      - smartmontools
+      - lsscsi
+
+#工具需要设置sid
+- name: get dell raid tools Dell Inc.
+  get_url:
+    url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/perccli64
+    dest: /usr/sbin/perccli64
+    mode: 4744
+  when: manufacturer == 'Dell Inc.'
+
+- name: get mega raid tools
+  get_url:
+    url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/storcli64
+    dest: /usr/sbin/storcli64
+    mode: 4744
+
+- name: get megaclisas
+  get_url:
+    url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/megaclisas-status.py
+    dest: /usr/sbin/megaclisas-status
+    mode: 4744
+
+- name: copy smartd script
+  copy:
+    src:  smartd.chart.sh
+    dest: /opt/netdata/netdata-plugins/charts.d/smartd.chart.sh
+    mode: 0664
+    owner: netdata
+    group: netdata
+  become: yes
+
+- name: copy smartd health.d
+  copy:
+    src:  health.d/smartd.conf
+    dest: /opt/netdata/usr/lib/netdata/conf.d/health.d/smartd.conf
+    mode: 0664
+    owner: netdata
+    group: netdata
+  become: yes
+
+
+- name: copy smartmontool config
+  copy:
+    src:  smartmontools
+    dest: /etc/default/smartmontools
+    mode: 0664
+    owner: netdata
+    group: netdata
+  become: yes
+
+- name:  smartd enable
+  service:
+    name: systemd-timesyncd
+    state: restart
+    enabled: yes
+  become: yes
+
+- name:  smartd enable
+  service:
+    name: systemd-timesyncd
+    state: restart
+    enabled: yes
+  become: yes
+
+- name: Enable netdata service and ensure it is started
+  service:
+    name: netdata
+    state: restarted
+    enabled: true
+  become: true
