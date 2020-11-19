@@ -60,10 +60,10 @@
     group: root
   become: yes
 
-- name:  restart smartd
+- name:  restart smartded
   service:
     name: smartd
-    state: restart
+    state: restarted
     enabled: yes
   become: yes
 
