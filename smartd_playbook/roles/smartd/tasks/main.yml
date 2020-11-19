@@ -19,7 +19,7 @@
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/perccli64
     dest: /usr/sbin/perccli64
     mode: 4744
-  when: manufacturer == 'Dell Inc.'
+  when: manufacturer.stdout == 'Dell Inc.'
 
 - name: get mega raid tools
   get_url:
