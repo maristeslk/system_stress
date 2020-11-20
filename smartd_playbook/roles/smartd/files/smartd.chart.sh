@@ -37,15 +37,15 @@ case $vendor in
         ;;
  *Lenovo*)
         vendor="lenovo"
-        raid_tool='storcli64'
+        raid_tool='sudo storcli64'
         ;;
  *Huawei*)
         vendor="huawei"
-        raid_tool='storcli64'
+        raid_tool='sudo storcli64'
         ;;
  *Dell*)
         vendor="dell"
-        raid_tool='perccli64'
+        raid_tool='sudo perccli64'
         ;;
  *HP*)
         vendor="hp"
@@ -93,13 +93,13 @@ smartd_create() {
           ens_slot="${ENS_NUM}:${SLOT_NUM}"
 
           
-          DISK=$(megaclisas-status  | awk -v FS='|' '{print $8 $10}'  |grep -w "${ens_slot}" | awk -v FS='/' '{print $3}' )
+          DISK=$(sudo megaclisas-status  | awk -v FS='|' '{print $8 $10}'  |grep -w "${ens_slot}" | awk -v FS='/' '{print $3}' )
           if [  ! -n "$DISK"  ];then
           #保留原始的/c0/e11/s1格式 后续会被处理 
             DISK=$(echo ${DISK_DRIVE})
           fi
           #用lsiID 才能用smart取到sn
-          LSI_ID=$(megaclisas-status  | awk -v FS='|' '{print $8 $9}'  |grep -w "${ens_slot}" | awk '{print $2}' )
+          LSI_ID=$(sudo megaclisas-status  | awk -v FS='|' '{print $8 $9}'  |grep -w "${ens_slot}" | awk '{print $2}' )
           SN=$(smartctl -d megaraid,${LSI_ID}  -a /dev/sda | grep  -E "[S|s]erial [N|n]umber:"  | awk '{print $3}')
 
           IF_DISK_TYPE=$(smartctl -d megaraid,${LSI_ID}  -a /dev/sda | grep -i 'SATA')
@@ -205,8 +205,8 @@ smartd_get() {
                 #DISK_DRIVE用来给smartctl扫描用
                 DISK_DRIVE=$(echo $info| cut -d ';' -f 3)
                 #DISK是用来简化 统一指标名称 sda nvme0
-                DISK=$(echo ${DISK_DRIVE} | sed "s:\/dev\/::" | sed "s:\/::g")
-              
+                # DISK=$(echo ${DISK_DRIVE} | sed "s:\/dev\/::" | sed "s:\/::g")
+                DISK=${DISK_DRIVE}
                 #根据raid类型获取健康状态
                 if [ "$CONTROLL_TYPE" == "megaraid" ];then
                     LSI_ID=$(echo $info| cut -d ';' -f 5)

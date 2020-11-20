@@ -25,12 +25,10 @@
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/storcli64
     dest: /usr/sbin/storcli64
 
-
 - name: get megaclisas
   get_url:
     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/megaclisas-status.py
     dest: /usr/sbin/megaclisas-status
-
 
 - name: change smartctl sid
   shell: chmod 4755 {{ item }}
