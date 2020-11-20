@@ -36,14 +36,20 @@
     - /usr/sbin/smartctl
     - /usr/sbin/storcli64
     - /usr/sbin/megaclisas-status
+  become: yes
+
+- name: change perccli64 sid
+  shell: chmod 4755 {{ item }}
+  with_items:
     - /usr/sbin/perccli64
   become: yes
+  when: manufacturer.stdout == 'Dell Inc.'
 
 - name: copy smartd script
   copy:
     src:  smartd.chart.sh
     dest: /opt/netdata/netdata-plugins/charts.d/smartd.chart.sh
-    mode: 0664
+    mode: 0755
     owner: netdata
     group: netdata
   become: yes
@@ -57,6 +63,15 @@
     group: netdata
   become: yes
 
+- name: copy chart.d.conf
+  copy:
+    src:  templates/netdata
+    dest: /opt/netdata/netdata-configs/charts.d.conf
+    mode: 0664
+    owner: netdata
+    group: netdata
+  become: yes
+  
 - name: copy smartmontool config
   copy:
     src:  smartmontools
@@ -80,11 +95,11 @@
     enabled: true
   become: true
 
-- name: copy netdata sudo file
-  copy:
-    src: templates/netdata
-    dest: /etc/sudoers.d/
-    mode: 0440 
-    owner: root
-    group: root
-  become: yes
+# - name: copy netdata sudo file
+#   copy:
+#     src: templates/netdata
+#     dest: /etc/sudoers.d/
+#     mode: 0440 
+#     owner: root
+#     group: root
+#   become: yes

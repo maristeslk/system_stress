@@ -96,7 +96,7 @@ smartd_create() {
           DISK=$(sudo megaclisas-status  | awk -v FS='|' '{print $8 $10}'  |grep -w "${ens_slot}" | awk -v FS='/' '{print $3}' )
           if [  ! -n "$DISK"  ];then
           #保留原始的/c0/e11/s1格式 后续会被处理 
-            DISK=$(echo ${DISK_DRIVE})
+            DISK=$(echo ${DISK_DRIVE} | sed "s:\/dev\/::" | sed "s:\/::g")
           fi
           #用lsiID 才能用smart取到sn
           LSI_ID=$(sudo megaclisas-status  | awk -v FS='|' '{print $8 $9}'  |grep -w "${ens_slot}" | awk '{print $2}' )
@@ -205,8 +205,8 @@ smartd_get() {
                 #DISK_DRIVE用来给smartctl扫描用
                 DISK_DRIVE=$(echo $info| cut -d ';' -f 3)
                 #DISK是用来简化 统一指标名称 sda nvme0
-                # DISK=$(echo ${DISK_DRIVE} | sed "s:\/dev\/::" | sed "s:\/::g")
-                DISK=${DISK_DRIVE}
+                DISK=$(echo ${DISK_DRIVE} | sed "s:\/dev\/::" | sed "s:\/::g")
+                #DISK=${DISK_DRIVE}
                 #根据raid类型获取健康状态
                 if [ "$CONTROLL_TYPE" == "megaraid" ];then
                     LSI_ID=$(echo $info| cut -d ';' -f 5)
