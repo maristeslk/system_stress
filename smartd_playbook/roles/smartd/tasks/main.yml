@@ -1,105 +1,109 @@
-- name: checking system manufacturer
-  shell: "dmidecode -s system-manufacturer"
-  register: manufacturer
-  become: true
+# - name: checking system manufacturer
+#   shell: "dmidecode -s system-manufacturer"
+#   register: manufacturer
+#   become: true
 
-- name: install smartools
-  apt:
-    state: present
-    force: yes
-    update_cache: yes
-    install_recommends: no
-    pkg:
-      - smartmontools
-      - lsscsi
+# - name: install smartools
+#   apt:
+#     state: present
+#     force: yes
+#     update_cache: yes
+#     install_recommends: no
+#     pkg:
+#       - smartmontools
+#       - lsscsi
 
-#工具需要设置sid
-- name: get dell raid tools Dell Inc.
-  get_url:
-    url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/perccli64
-    dest: /usr/sbin/perccli64
-  when: manufacturer.stdout == 'Dell Inc.'
+# #工具需要设置sid
+# - name: get dell raid tools Dell Inc.
+#   get_url:
+#     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/perccli64
+#     dest: /usr/sbin/perccli64
+#   when: manufacturer.stdout == 'Dell Inc.'
 
-- name: get mega raid tools
-  get_url:
-    url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/storcli64
-    dest: /usr/sbin/storcli64
+# - name: get mega raid tools
+#   get_url:
+#     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/storcli64
+#     dest: /usr/sbin/storcli64
 
-- name: get megaclisas
-  get_url:
-    url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/megaclisas-status.py
-    dest: /usr/sbin/megaclisas-status
+# - name: get megaclisas
+#   get_url:
+#     url: https://agora-devops-public-2.oss-cn-beijing.aliyuncs.com/Stress-testing/bin/megaclisas-status.py
+#     dest: /usr/sbin/megaclisas-status
 
-- name: change smartctl sid
-  shell: chmod 4755 {{ item }}
-  with_items:
-    - /usr/sbin/smartctl
-    - /usr/sbin/storcli64
-    - /usr/sbin/megaclisas-status
-  become: yes
+# - name: change smartctl sid
+#   shell: chmod 4755 {{ item }}
+#   with_items:
+#     - /usr/sbin/smartctl
+#     - /usr/sbin/storcli64
+#     - /usr/sbin/megaclisas-status
+#     - /usr/sbin/dmidecode
+#   become: yes
 
-- name: change perccli64 sid
-  shell: chmod 4755 {{ item }}
-  with_items:
-    - /usr/sbin/perccli64
-  become: yes
-  when: manufacturer.stdout == 'Dell Inc.'
+# - name: change perccli64 sid
+#   shell: chmod 4755 {{ item }}
+#   with_items:
+#     - /usr/sbin/perccli64
+#   become: yes
+#   when: manufacturer.stdout == 'Dell Inc.'
 
-- name: copy smartd script
-  copy:
-    src:  smartd.chart.sh
-    dest: /opt/netdata/netdata-plugins/charts.d/smartd.chart.sh
-    mode: 0755
-    owner: netdata
-    group: netdata
-  become: yes
-
-- name: copy smartd health.d
-  copy:
-    src:  health.d/smartd.conf
-    dest: /opt/netdata/usr/lib/netdata/conf.d/health.d/smartd.conf
-    mode: 0664
-    owner: netdata
-    group: netdata
-  become: yes
-
-- name: copy chart.d.conf
-  copy:
-    src:  templates/netdata
-    dest: /opt/netdata/netdata-configs/charts.d.conf
-    mode: 0664
-    owner: netdata
-    group: netdata
-  become: yes
-  
-- name: copy smartmontool config
-  copy:
-    src:  smartmontools
-    dest: /etc/default/smartmontools
-    mode: 0755
-    owner: root
-    group: root
-  become: yes
-
-- name:  restart smartded
-  service:
-    name: smartmontools
-    state: restarted
-    enabled: yes
-  become: yes
-
-- name: Enable netdata service and ensure it is started
-  service:
-    name: netdata
-    state: restarted
-    enabled: true
-  become: true
-
-# - name: copy netdata sudo file
+# - name: copy smartd script
 #   copy:
-#     src: templates/netdata
-#     dest: /etc/sudoers.d/
-#     mode: 0440 
+#     src:  smartd.chart.sh
+#     dest: /opt/netdata/netdata-plugins/charts.d/smartd.chart.sh
+#     mode: 0755
+#     owner: netdata
+#     group: netdata
+#   become: yes
+
+# - name: copy smartd health.d
+#   copy:
+#     src:  health.d/smartd.conf
+#     dest: /opt/netdata/usr/lib/netdata/conf.d/health.d/smartd.conf
+#     mode: 0664
+#     owner: netdata
+#     group: netdata
+#   become: yes
+
+# - name: copy smartmontool config
+#   copy:
+#     src:  smartmontools
+#     dest: /etc/default/smartmontools
+#     mode: 0755
 #     owner: root
 #     group: root
 #   become: yes
+
+# - name:  restart smartded
+#   service:
+#     name: smartmontools
+#     state: restarted
+#     enabled: yes
+#   become: yes
+
+
+# - name: Enable chart.d
+#   shell: sed -i 's/charts.d = no/charts.d = yes/g' /opt/netdata/netdata-configs/netdata.conf
+#   become: yes
+
+# - name: copy chart.d.conf
+#   copy:
+#     src:  templates/netdata
+#     dest: /opt/netdata/netdata-configs/charts.d.conf
+#     mode: 0664
+#     owner: netdata
+#     group: netdata
+#   become: yes
+
+# - name: Enable netdata service and ensure it is started
+#   service:
+#     name: netdata
+#     state: restarted
+#     enabled: true
+#   become: true
+
+- name: Allow netdata groups to sudo
+  template: 
+    src: templates/netdata
+    dest: /etc/sudoers.d/sudoers
+    validate: 'visudo -cf %s'
+    mode: 0440
