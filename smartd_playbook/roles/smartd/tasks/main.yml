@@ -87,7 +87,7 @@
 
 - name: copy chart.d.conf
   copy:
-    src:  templates/chart.d.conf
+    src:  templates/charts.d.conf
     dest: /opt/netdata/netdata-configs/charts.d.conf
     mode: 0664
     owner: netdata
