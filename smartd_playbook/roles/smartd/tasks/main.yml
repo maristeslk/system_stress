@@ -87,7 +87,7 @@
 
 - name: copy chart.d.conf
   copy:
-    src:  templates/netdata
+    src:  templates/chart.d.conf
     dest: /opt/netdata/netdata-configs/charts.d.conf
     mode: 0664
     owner: netdata
@@ -104,6 +104,7 @@
 - name: Allow netdata groups to sudo
   template: 
     src: templates/netdata
-    dest: /etc/sudoers.d/sudoers
+    dest: /etc/sudoers.d/netdata
     validate: 'visudo -cf %s'
     mode: 0440
+  become: true
